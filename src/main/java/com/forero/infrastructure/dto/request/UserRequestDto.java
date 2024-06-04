@@ -1,13 +1,4 @@
 package com.forero.infrastructure.dto.request;
 
-import lombok.Getter;
-import lombok.Setter;
+public record UserRequestDto(String name, String email, String phone, String address) {}
 
-@Getter
-@Setter
-public class UserRequestDto {
-    private String name;
-    private String email;
-    private String phone;
-    private String address;
-}
