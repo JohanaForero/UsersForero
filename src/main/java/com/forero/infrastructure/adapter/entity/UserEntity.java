@@ -1,14 +1,15 @@
 package com.forero.infrastructure.adapter.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
 
-@Entity
+import lombok.Getter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
+@Getter
 @Table(name = "users")
 public class UserEntity {
-    @Getter
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
