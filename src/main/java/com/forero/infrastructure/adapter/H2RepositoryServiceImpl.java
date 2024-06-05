@@ -6,9 +6,12 @@ import com.forero.infrastructure.adapter.entity.UserEntity;
 import com.forero.infrastructure.adapter.repository.UserRepository;
 import com.forero.infrastructure.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class H2RepositoryServiceImpl implements UserService {

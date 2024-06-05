@@ -17,25 +17,20 @@ repositories {
 }
 
 dependencies {
-    // Spring WebFlux
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
-    // MapStruct para mapeos de DTO
     implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
-    // Spring Data R2DBC para bases de datos reactivas
     implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
 
-    // H2 Database con soporte R2DBC
     implementation 'io.r2dbc:r2dbc-h2'
     implementation 'com.h2database:h2:2.2.224'
 
-    // Lombok para getters, setters, constructores, etc.
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
-    // Dependencias para pruebas
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
