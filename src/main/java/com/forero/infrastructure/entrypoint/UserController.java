@@ -26,8 +26,8 @@ public class UserController {
     public Mono<UserResponseDto> createUser(@RequestBody final UserRequestDto userRequestDto) {
         log.info(LOGGER_PREFIX + "[createUser] Request {}", userRequestDto);
         final User user = this.userMapper.toModel(userRequestDto);
-        return userCommand.execute(user)
-                .map(userMapper::toDto)
+        return this.userCommand.execute(user)
+                .map(this.userMapper::toDto)
                 .doOnNext(userResponseDto -> log.info(LOGGER_PREFIX + "[createUser] Response {}", userResponseDto));
     }
 }
