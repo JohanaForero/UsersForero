@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum CodeException {
     INTERNAL_SERVER_ERROR("Internal server error"),
-    CUSTOMER_NOT_FOUND("Customer not found");
-
+    USER_NOT_FOUND("User not found"),
+    INVALID_PARAMETERS("Invalid Parameters");
     private final String messageFormat;
 }
