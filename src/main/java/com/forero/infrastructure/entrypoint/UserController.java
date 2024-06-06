@@ -19,8 +19,8 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class UserController {
     private static final String LOGGER_PREFIX = String.format("[%s] ", UserController.class.getSimpleName());
-    private UserCommand userCommand;
-    private UserMapper userMapper;
+    private final UserCommand userCommand;
+    private final UserMapper userMapper;
 
     @PostMapping("/register")
     public Mono<UserResponseDto> createUser(@RequestBody final UserRequestDto userRequestDto) {

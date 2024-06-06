@@ -6,7 +6,7 @@ import com.forero.infrastructure.dto.request.UserRequestDto;
 import com.forero.infrastructure.dto.response.UserResponseDto;
 import org.mapstruct.Mapper;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UserMapper {
     User toModel(UserRequestDto userRequestDto);
 
