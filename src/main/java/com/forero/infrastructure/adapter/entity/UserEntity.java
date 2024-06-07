@@ -1,13 +1,13 @@
 package com.forero.infrastructure.adapter.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@Getter
+@Setter
 @Document(collection = "users")
-@AllArgsConstructor
-@Data
 public class UserEntity {
     @Id
     private String id;
@@ -19,4 +19,12 @@ public class UserEntity {
     private String phone;
 
     private String address;
+
+    public UserEntity(String id, String name, String email, String phone, String address) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.address = address;
+    }
 }

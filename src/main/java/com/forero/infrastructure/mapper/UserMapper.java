@@ -12,35 +12,21 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     User toModel(UserRequestDto userRequestDto);
 
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "name", source = "name")
     UserResponseDto toDto(User user);
 
     default User toModel(final UserEntity userEntity) {
         if (userEntity == null) {
             return null;
         }
-
-        return new User(
-                userEntity.getId(),
-                userEntity.getName(),
-                userEntity.getEmail(),
-                userEntity.getPhone(),
-                userEntity.getAddress()
-        );
+        return User.builder()
+                .id(userEntity.getId())
+                .name(userEntity.getName())
+                .email(userEntity.getEmail())
+                .phone(userEntity.getPhone())
+                .address(userEntity.getAddress())
+                .build();
     }
 
-    default UserEntity toEntity(final User user) {
-        if (user == null) {
-            return null;
-        }
-
-        return new UserEntity(
-                user.id(),
-                user.name(),
-                user.email(),
-                user.phone(),
-                user.address());
-    }
+    UserEntity toEntity(User user);
 }
 
