@@ -18,7 +18,6 @@ public class UserUseCase {
         return this.userService.getAllUsers();
     }
 
-
     public Mono<User> getUser(final String email) {
         return this.userService.findByEmail(email);
     }

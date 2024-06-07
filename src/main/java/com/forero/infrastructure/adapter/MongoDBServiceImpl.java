@@ -52,9 +52,11 @@ public class MongoDBServiceImpl implements UserService {
 
     @Override
     public Mono<User> findByEmail(final String email) {
+        log.info(LOGGER_PREFIX, "[findByEmail] Request {}", email);
         return this.userRepository.findByEmail(email)
                 .map(this.userMapper::toModel)
-                .doOnNext(user -> log.info("[findUserByEmail] User found: {}", user))
+                .doOnNext(user -> log.info(LOGGER_PREFIX, "[findByEmail] Response: {}", email))
+                .doOnError(error -> log.error("[findUserByEmail] Error finding user by email: {}", email, error))
                 .switchIfEmpty(Mono.error(new UserUseCaseException(CodeException.USER_NOT_FOUND, null, email)));
     }
 }

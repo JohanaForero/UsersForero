@@ -1,10 +1,8 @@
 package com.forero.infrastructure.entrypoint;
 
 import com.forero.application.command.UserCommand;
-import com.forero.application.exception.UserUseCaseException;
 import com.forero.application.query.UserQuery;
 import com.forero.application.query.UsersQuery;
-import com.forero.domain.exception.CodeException;
 import com.forero.domain.model.User;
 import com.forero.infrastructure.dto.request.UserRequestDto;
 import com.forero.infrastructure.dto.response.UserResponseDto;
@@ -53,8 +51,6 @@ public class UserController {
         log.info(LOGGER_PREFIX + "[getUser] Request {}", email);
         return this.userQuery.execute(email)
                 .map(this.userMapper::toDto)
-                .doOnNext(userResponseDto -> log.info(LOGGER_PREFIX + "[all] Response {}", userResponseDto))
-                .doOnError(error -> log.error(LOGGER_PREFIX + "[findUserById] Error finding user by ID", error))
-                .switchIfEmpty(Mono.error(new UserUseCaseException(CodeException.USER_NOT_FOUND, null, email)));
+                .doOnNext(userResponseDto -> log.info(LOGGER_PREFIX + "[all] Response {}", userResponseDto));
     }
 }
