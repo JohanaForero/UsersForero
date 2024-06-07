@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: user
+  data:
+    mongodb:
+      database:
+      uri: 'mongodb+srv://JohanaForeroM:dW%406mUxcp%24j%24nfT@atlascluster.mvb6yaq.mongodb.net/MicroWebFlux?retryWrites=true&w=majority&appName=AtlasCluster'
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG
