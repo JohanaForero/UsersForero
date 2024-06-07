@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class H2RepositoryServiceImpl implements UserService {
+public class MongoDBServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
