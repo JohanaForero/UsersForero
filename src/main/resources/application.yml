@@ -3,9 +3,8 @@ spring:
     name: user
   data:
     mongodb:
-      database:
-      uri: 'mongodb+srv://JohanaForeroM:dW%406mUxcp%24j%24nfT@atlascluster.mvb6yaq.mongodb.net/MicroWebFlux?retryWrites=true&w=majority&appName=AtlasCluster'
-
+      database: ${MONGO_DB_NAME}
+      uri: ${MONGO_URI}
 logging:
   level:
     org:

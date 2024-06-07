@@ -14,6 +14,8 @@ import org.springframework.data.mongodb.core.SimpleReactiveMongoDatabaseFactory;
 @Configuration
 @RequiredArgsConstructor
 public class UserBeanConfiguration {
+    private final MongoDBProperties mongoDBProperties;
+
     @Bean
     public UserUseCase userUseCase(final UserService userService) {
         return new UserUseCase(userService);
@@ -26,8 +28,8 @@ public class UserBeanConfiguration {
 
     @Bean
     public ReactiveMongoDatabaseFactory reactiveMongoDatabaseFactory() {
-        return new SimpleReactiveMongoDatabaseFactory(MongoClients.create("mongodb+srv://JohanaForeroM:dW%406mUxcp" +
-                "%24j%24nfT@atlascluster.mvb6yaq.mongodb.net/MicroWebFlux?retryWrites=true&w=majority&appName=AtlasCluster"), "MicroWebFlux");
+        return new SimpleReactiveMongoDatabaseFactory(MongoClients.create(this.mongoDBProperties.getUri()),
+                this.mongoDBProperties.getDatabase());
     }
 
     @Bean
