@@ -1,13 +1,13 @@
 package com.forero.infrastructure.adapter.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Getter
-@Setter
 @Document(collection = "users")
+@AllArgsConstructor
+@Data
 public class UserEntity {
     @Id
     private String id;
