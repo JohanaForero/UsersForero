@@ -17,4 +17,9 @@ public class UserUseCase {
     public Flux<User> getAll() {
         return this.userService.getAllUsers();
     }
+
+
+    public Mono<User> getUser(final String email) {
+        return this.userService.findByEmail(email);
+    }
 }

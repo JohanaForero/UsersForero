@@ -12,6 +12,12 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     User toModel(UserRequestDto userRequestDto);
 
+    @Mapping(target = "name", ignore = true)
+    @Mapping(target = "email", ignore = true)
+    @Mapping(target = "phone", ignore = true)
+    @Mapping(target = "address", ignore = true)
+    User toModel(String userId);
+
     UserResponseDto toDto(User user);
 
     default User toModel(final UserEntity userEntity) {

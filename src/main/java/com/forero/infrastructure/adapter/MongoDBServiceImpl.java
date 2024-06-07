@@ -27,12 +27,12 @@ public class MongoDBServiceImpl implements UserService {
         log.info(LOGGER_PREFIX + "[createUser] Request {}", user);
         return this.userRepository.save(userEntity)
                 .map(this.userMapper::toModel)
-                .doOnNext(savedUser -> log.info(LOGGER_PREFIX + "[createUser] Response {}", savedUser))
+                .doOnNext(savedUser -> log.info(LOGGER_PREFIX, "[createUser] Response {}", savedUser))
                 .doOnError(error -> {
                     log.error(LOGGER_PREFIX + "[createUser] Error creating user", error);
                     throw new UserUseCaseException(CodeException.INVALID_PARAMETERS, null);
                 })
-                .doOnSuccess(success -> log.info(LOGGER_PREFIX + "[createUser] Response {}", success))
+                .doOnSuccess(success -> log.info(LOGGER_PREFIX, "[createUser] Response {}", success))
                 .onErrorResume(UserUseCaseException.class, Mono::error)
                 .onErrorResume(error -> Mono.error(new UserUseCaseException(CodeException.INVALID_PARAMETERS, null)));
     }
@@ -44,9 +44,17 @@ public class MongoDBServiceImpl implements UserService {
 
     @Override
     public Flux<User> getAllUsers() {
-        log.info(LOGGER_PREFIX + "[getAllUsers] List all users ");
+        log.info(LOGGER_PREFIX, "[getAllUsers] List all users ");
         return this.userRepository.findAll()
                 .map(this.userMapper::toModel)
-                .doOnNext(user -> log.info(LOGGER_PREFIX + "[getAllUsers] Retrieved user: {}", user));
+                .doOnNext(user -> log.info(LOGGER_PREFIX, "[getAllUsers] Retrieved user: {}", user));
+    }
+
+    @Override
+    public Mono<User> findByEmail(final String email) {
+        return this.userRepository.findByEmail(email)
+                .map(this.userMapper::toModel)
+                .doOnNext(user -> log.info("[findUserByEmail] User found: {}", user))
+                .switchIfEmpty(Mono.error(new UserUseCaseException(CodeException.USER_NOT_FOUND, null, email)));
     }
 }

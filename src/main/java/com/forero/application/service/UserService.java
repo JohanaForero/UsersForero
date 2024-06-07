@@ -10,4 +10,6 @@ public interface UserService {
     Mono<Boolean> existsByEmail(String email);
 
     Flux<User> getAllUsers();
+
+    Mono<User> findByEmail(String email);
 }
