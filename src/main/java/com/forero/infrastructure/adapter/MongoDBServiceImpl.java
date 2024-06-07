@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -19,6 +18,7 @@ public class MongoDBServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
+    @Override
     public Mono<User> createUser(final User user) {
         final UserEntity userEntity = this.userMapper.toEntity(user);
         return this.userRepository.save(userEntity)
