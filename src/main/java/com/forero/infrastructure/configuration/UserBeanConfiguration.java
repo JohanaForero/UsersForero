@@ -1,6 +1,7 @@
 package com.forero.infrastructure.configuration;
 
 import com.forero.application.command.UserCommand;
+import com.forero.application.query.UserQuery;
 import com.forero.application.service.UserService;
 import com.forero.application.usecase.UserUseCase;
 import com.mongodb.reactivestreams.client.MongoClients;
@@ -24,6 +25,11 @@ public class UserBeanConfiguration {
     @Bean
     public UserCommand userCommand(final UserUseCase userUseCase) {
         return new UserCommand(userUseCase);
+    }
+
+    @Bean
+    public UserQuery userQuery(final UserUseCase userUseCase) {
+        return new UserQuery(userUseCase);
     }
 
     @Bean
