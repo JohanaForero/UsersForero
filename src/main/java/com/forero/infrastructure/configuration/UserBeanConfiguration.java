@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 public class UserBeanConfiguration {
-    private final MongoDBProperties mongoDBProperties;
 
     @Bean
     public UserUseCase userUseCase(final UserService userService) {
