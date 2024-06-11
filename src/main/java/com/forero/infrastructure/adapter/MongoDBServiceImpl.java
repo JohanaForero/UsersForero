@@ -1,5 +1,6 @@
 package com.forero.infrastructure.adapter;
 
+import com.forero.application.exception.RepositoryException;
 import com.forero.application.exception.UserUseCaseException;
 import com.forero.application.service.UserService;
 import com.forero.domain.exception.CodeException;
@@ -26,28 +27,33 @@ public class MongoDBServiceImpl implements UserService {
         final UserEntity userEntity = this.userMapper.toEntity(user);
         log.info(LOGGER_PREFIX + "[createUser] Request {}", user);
         return this.userRepository.save(userEntity)
+                .doOnSuccess(userEntityResult -> log.info(LOGGER_PREFIX, "[createUser] Response {}", userEntityResult))
                 .map(this.userMapper::toModel)
-                .doOnNext(savedUser -> log.info(LOGGER_PREFIX, "[createUser] Response {}", savedUser))
-                .doOnError(error -> {
-                    log.error(LOGGER_PREFIX + "[createUser] Error creating user", error);
-                    throw new UserUseCaseException(CodeException.INVALID_PARAMETERS, null);
-                })
-                .doOnSuccess(success -> log.info(LOGGER_PREFIX, "[createUser] Response {}", success))
-                .onErrorResume(UserUseCaseException.class, Mono::error)
-                .onErrorResume(error -> Mono.error(new UserUseCaseException(CodeException.INVALID_PARAMETERS, null)));
+                .onErrorResume(error -> {
+                    log.error(LOGGER_PREFIX, "[existsByEmail] Error occurred: {}", LOGGER_PREFIX, error.getMessage());
+                    return Mono.error(new RepositoryException(CodeException.INTERNAL_SERVER_ERROR, null));
+                });
     }
 
     @Override
     public Mono<Boolean> existsByEmail(final String email) {
-        return this.userRepository.existsByEmail(email);
+        log.info(LOGGER_PREFIX, "[existsByEmail] Request {}", email);
+        return this.userRepository.existsByEmail(email)
+                .doOnSuccess(isEmail -> log.info(LOGGER_PREFIX, "[existsByEmail] Response {}", isEmail))
+                .onErrorResume(error -> {
+                    log.error(LOGGER_PREFIX, "[existsByEmail] Error occurred: {}", LOGGER_PREFIX, error.getMessage());
+                    return Mono.error(new RepositoryException(CodeException.INTERNAL_SERVER_ERROR, null));
+                });
+
     }
 
     @Override
     public Flux<User> getAllUsers() {
         log.info(LOGGER_PREFIX, "[getAllUsers] List all users ");
         return this.userRepository.findAll()
-                .map(this.userMapper::toModel)
-                .doOnNext(user -> log.info(LOGGER_PREFIX, "[getAllUsers] Retrieved user: {}", user));
+                .flatMap(user -> Mono.just(this.userMapper.toModel(user)))
+                .doOnNext(user -> log.info("{} [getAllUsers] Retrieved user: {}", LOGGER_PREFIX, user))
+                .doOnError(error -> log.error("{} [getAllUsers] Error retrieving users: {}", LOGGER_PREFIX, error.getMessage()));
     }
 
     @Override

@@ -12,26 +12,9 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     User toModel(UserRequestDto userRequestDto);
 
-    @Mapping(target = "name", ignore = true)
-    @Mapping(target = "email", ignore = true)
-    @Mapping(target = "phone", ignore = true)
-    @Mapping(target = "address", ignore = true)
-    User toModel(String userId);
+    User toModel(UserEntity userEntity);
 
     UserResponseDto toDto(User user);
-
-    default User toModel(final UserEntity userEntity) {
-        if (userEntity == null) {
-            return null;
-        }
-        return User.builder()
-                .id(userEntity.getId())
-                .name(userEntity.getName())
-                .email(userEntity.getEmail())
-                .phone(userEntity.getPhone())
-                .address(userEntity.getAddress())
-                .build();
-    }
 
     UserEntity toEntity(User user);
 }
