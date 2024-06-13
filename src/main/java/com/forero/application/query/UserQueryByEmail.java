@@ -3,13 +3,13 @@ package com.forero.application.query;
 import com.forero.application.usecase.UserUseCase;
 import com.forero.domain.model.User;
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
-public class UsersQuery {
+public class UserQueryByEmail {
     private final UserUseCase userUseCase;
 
-    public Flux<User> execute() {
-        return this.userUseCase.getUsers();
+    public Mono<User> execute(final String email) {
+        return this.userUseCase.getUser(email);
     }
 }

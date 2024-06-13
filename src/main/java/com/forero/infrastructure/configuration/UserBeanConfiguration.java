@@ -1,7 +1,9 @@
 package com.forero.infrastructure.configuration;
 
 import com.forero.application.command.UserCommand;
-import com.forero.application.query.UserQuery;
+import com.forero.application.command.UserDeleteCommand;
+import com.forero.application.command.UserPartialUpdateCommand;
+import com.forero.application.query.UserQueryByEmail;
 import com.forero.application.query.UsersQuery;
 import com.forero.application.service.UserService;
 import com.forero.application.usecase.UserUseCase;
@@ -24,12 +26,22 @@ public class UserBeanConfiguration {
     }
 
     @Bean
+    public UserDeleteCommand userDeleteCommand(final UserUseCase userUseCase) {
+        return new UserDeleteCommand(userUseCase);
+    }
+
+    @Bean
+    public UserPartialUpdateCommand userPartialUpdateCommand(final UserUseCase userUseCase) {
+        return new UserPartialUpdateCommand(userUseCase);
+    }
+
+    @Bean
     public UsersQuery usersQuery(final UserUseCase userUseCase) {
         return new UsersQuery(userUseCase);
     }
 
     @Bean
-    public UserQuery userQuery(final UserUseCase userUseCase) {
-        return new UserQuery(userUseCase);
+    public UserQueryByEmail userQueryByEmail(final UserUseCase userUseCase) {
+        return new UserQueryByEmail(userUseCase);
     }
 }
