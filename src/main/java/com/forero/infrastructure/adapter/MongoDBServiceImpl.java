@@ -1,11 +1,10 @@
 package com.forero.infrastructure.adapter;
 
 import com.forero.application.exception.RepositoryException;
-import com.forero.application.exception.UserUseCaseException;
 import com.forero.application.service.UserService;
 import com.forero.domain.exception.CodeException;
 import com.forero.domain.model.User;
-import com.forero.infrastructure.adapter.repository.UserRepository;
+import com.forero.infrastructure.adapter.dao.UserDao;
 import com.forero.infrastructure.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,15 +17,15 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class MongoDBServiceImpl implements UserService {
     private static final String LOGGER_PREFIX = String.format("[%s] ", MongoDBServiceImpl.class.getSimpleName());
-    private final UserRepository userRepository;
+    private final UserDao userDao;
     private final UserMapper userMapper;
 
     @Override
     public Mono<User> save(final User user) {
         return Mono.just(user)
-                .doFirst(() -> log.info(LOGGER_PREFIX + "[createUser] Request {}", user))
                 .map(this.userMapper::toEntity)
-                .flatMap(this.userRepository::save)
+                .doFirst(() -> log.info(LOGGER_PREFIX + "[createUser] Request {}", user))
+                .flatMap(this.userDao::save)
                 .doOnSuccess(userEntityResult -> log.info(LOGGER_PREFIX + "[createUser] Response {}", userEntityResult))
                 .map(this.userMapper::toModel)
                 .onErrorResume(error -> {
@@ -38,7 +37,7 @@ public class MongoDBServiceImpl implements UserService {
     @Override
     public Mono<Boolean> existsByEmail(final String email) {
         log.info(LOGGER_PREFIX, "[existsByEmail] Request {}", email);
-        return this.userRepository.existsByEmail(email)
+        return this.userDao.existsByEmail(email)
                 .doOnSuccess(isEmail -> log.info(LOGGER_PREFIX, "[existsByEmail] Response {}", isEmail))
                 .onErrorResume(error -> {
                     log.error(LOGGER_PREFIX, "[existsByEmail] Error occurred: {}", error.getMessage());
@@ -48,7 +47,7 @@ public class MongoDBServiceImpl implements UserService {
 
     @Override
     public Flux<User> getAllUsers() {
-        return this.userRepository.findAll()
+        return this.userDao.findAll()
                 .doFirst(() -> log.info(LOGGER_PREFIX + "[getAllUsers] List {}"))
                 .map(this.userMapper::toModel)
                 .doOnSubscribe(subscription -> log.info(LOGGER_PREFIX + "[getAllUsers] Subscription started"))
@@ -61,18 +60,18 @@ public class MongoDBServiceImpl implements UserService {
 
     @Override
     public Mono<Void> delete(final String nameUser, final String email) {
-        return this.userRepository.deleteByNameAndEmail(nameUser, email)
+        return this.userDao.deleteByNameAndEmail(nameUser, email)
                 .doFirst(() -> log.info(LOGGER_PREFIX + "[deleteUser] request {}, {}", nameUser, email))
                 .doOnSuccess(voidFlow -> log.info(LOGGER_PREFIX + "[deleteUser] response void"));
     }
 
     @Override
     public Mono<User> findByEmail(final String email) {
-        log.info(LOGGER_PREFIX, "[findByEmail] Request {}", email);
-        return this.userRepository.findByEmail(email)
+        return this.userDao.findByEmail(email)
+                .doFirst(() -> log.info(LOGGER_PREFIX, "[findByEmail] Request {}", email))
+                .doOnSuccess(voidFlow -> log.info(LOGGER_PREFIX + "[deleteUser] response void"))
                 .map(this.userMapper::toModel)
-                .doOnNext(user -> log.info(LOGGER_PREFIX, "[findByEmail] Response: {}", email))
                 .doOnError(error -> log.error("[findUserByEmail] Error finding user by email: {}", email, error))
-                .switchIfEmpty(Mono.error(new UserUseCaseException(CodeException.USER_NOT_FOUND, null, email)));
+                .switchIfEmpty(Mono.error(new RepositoryException(CodeException.USER_NOT_FOUND, null, email)));
     }
 }

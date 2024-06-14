@@ -1,4 +1,4 @@
-package com.forero.infrastructure.adapter.repository;
+package com.forero.infrastructure.adapter.dao;
 
 import com.forero.infrastructure.adapter.entity.UserEntity;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface UserRepository extends ReactiveMongoRepository<UserEntity, String> {
+public interface UserDao extends ReactiveMongoRepository<UserEntity, String> {
     Mono<Boolean> existsByEmail(String email);
 
     Mono<UserEntity> findByEmail(String email);

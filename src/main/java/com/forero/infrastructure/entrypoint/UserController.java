@@ -5,7 +5,6 @@ import com.forero.application.command.UserDeleteCommand;
 import com.forero.application.command.UserPartialUpdateCommand;
 import com.forero.application.query.UserQueryByEmail;
 import com.forero.application.query.UsersQuery;
-import com.forero.domain.model.User;
 import com.forero.infrastructure.dto.request.UserPartialUpdateRequestDto;
 import com.forero.infrastructure.dto.request.UserRequestDto;
 import com.forero.infrastructure.dto.response.UserResponseDto;
@@ -38,30 +37,30 @@ public class UserController {
 
     @PostMapping("/register")
     public Mono<UserResponseDto> createUser(@RequestBody final UserRequestDto userRequestDto) {
-        log.info(LOGGER_PREFIX + "[createUser] Request {}", userRequestDto);
-        final User user = this.userMapper.toModel(userRequestDto);
-        return this.userCommand.execute(user)
+        return this.userCommand.execute(this.userMapper.toModel(userRequestDto))
+                .doFirst(() -> log.info(LOGGER_PREFIX + "[saveUser] request {}", userRequestDto))
                 .map(this.userMapper::toDto)
-                .doOnNext(userResponseDto -> log.info(LOGGER_PREFIX + "[createUser] Response {}", userResponseDto));
+                .doOnSuccess(userCreatedResponseDto ->
+                        log.info(LOGGER_PREFIX + "[saveUser] response {}", userCreatedResponseDto));
     }
 
     @GetMapping("/all")
     public Flux<UserResponseDto> getAllUsers() {
-        log.info(LOGGER_PREFIX + "[all] Users list request ");
         return this.usersQuery.execute()
+                .doFirst(() -> log.info(LOGGER_PREFIX + "[getAllUsers] List {}"))
                 .map(this.userMapper::toDto)
                 .doOnNext(userResponseDto -> log.info(LOGGER_PREFIX + "[all] Response {}", userResponseDto));
     }
 
     @GetMapping("/{email}")
     public Mono<UserResponseDto> getUser(@PathVariable final String email) {
-        log.info(LOGGER_PREFIX + "[getUser] Request {}", email);
         return this.userQueryByEmail.execute(email)
+                .doFirst(() -> log.info(LOGGER_PREFIX + "[getUser] Request {}", email))
                 .map(this.userMapper::toDto)
-                .doOnNext(userResponseDto -> log.info(LOGGER_PREFIX + "[all] Response {}", userResponseDto));
+                .doOnSuccess(userResponseDto -> log.info(LOGGER_PREFIX + "[all] Response {}", userResponseDto));
     }
 
-    @PostMapping("/")
+    @PostMapping("/userNew")
     public Mono<Void> updateUser(@RequestBody final UserPartialUpdateRequestDto userPartialUpdateDto) {
         return this.userPartialUpdateCommand.execute(this.userMapper.toModel(userPartialUpdateDto))
                 .doFirst(() -> log.info(LOGGER_PREFIX + "[updateUser] request {}", userPartialUpdateDto))
@@ -69,7 +68,7 @@ public class UserController {
                         log.info(LOGGER_PREFIX + "[updateUser] response void"));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/userDelete")
     public Mono<Void> deleteUser(@RequestParam(value = "name") final String userName,
                                  @RequestParam(value = "email") final String email) {
         return this.userDeleteCommand.execute(userName, email)

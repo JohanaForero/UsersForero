@@ -46,27 +46,39 @@ public class UserUseCase {
     }
 
     private Mono<Void> validateName(final User user) {
-        if (!user.validateUserName()) {
-            log.error(LOGGER_PREFIX + "[validateName] name user invalid");
-            return Mono.error(new UserUseCaseException(CodeException.INVALID_PARAMETERS, null, "name"));
-        }
-        return Mono.empty();
+        return Mono.just(user)
+                .flatMap(u -> {
+                    if (!u.validateUserName()) {
+                        return Mono.error(new UserUseCaseException(CodeException.INVALID_PARAMETERS, null, "name"));
+                    }
+                    return Mono.empty();
+                })
+                .doOnError(error -> log.error(LOGGER_PREFIX + "[validateName] name user invalid", error))
+                .then();
     }
 
     private Mono<Void> validateEmail(final User user) {
-        if (!user.isValidEmail()) {
-            log.error(LOGGER_PREFIX + "[validateEmail] email user invalid");
-            return Mono.error(new UserUseCaseException(CodeException.INVALID_PARAMETERS, null, "email"));
-        }
-        return Mono.empty();
+        return Mono.just(user)
+                .flatMap(u -> {
+                    if (!u.isValidEmail()) {
+                        return Mono.error(new UserUseCaseException(CodeException.INVALID_PARAMETERS, null, "email"));
+                    }
+                    return Mono.empty();
+                })
+                .doOnError(error -> log.error(LOGGER_PREFIX + "[validateEmail] email user invalid", error))
+                .then();
     }
 
     private Mono<Void> validatePhone(final User user) {
-        if (!user.isValidPhone()) {
-            log.error(LOGGER_PREFIX + "[validatePhone] phone user invalid");
-            return Mono.error(new UserUseCaseException(CodeException.INVALID_PARAMETERS, null, "phone"));
-        }
-        return Mono.empty();
+        return Mono.just(user)
+                .flatMap(u -> {
+                    if (!u.isValidPhone()) {
+                        return Mono.error(new UserUseCaseException(CodeException.INVALID_PARAMETERS, null, "phone"));
+                    }
+                    return Mono.empty();
+                })
+                .doOnError(error -> log.error(LOGGER_PREFIX + "[validatePhone] phone user invalid", error))
+                .then();
     }
 
     private Mono<Boolean> existEmail(final String email) {
