@@ -1,4 +1,8 @@
 package com.forero.infrastructure.dto.request;
 
-public record UserRequestDto(String name, String email, String phone, String address) {}
+import lombok.Builder;
+
+@Builder
+public record UserRequestDto(String name, String email, String phone, String address) {
+}
 
