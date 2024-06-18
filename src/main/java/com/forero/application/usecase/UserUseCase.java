@@ -25,23 +25,28 @@ public class UserUseCase {
 
     public Mono<User> createUser(final User user) {
         return this.validateUserFields(user)
-                .then(this.userService.save(user));
+                .then(this.validateUniqueEmail(user.email()))
+                .then(Mono.fromCallable(() -> user.toBuilder()
+                        .build()))
+                .flatMap(this.userService::save);
+    }
+
+    public Mono<Void> validateUniqueEmail(final String email) {
+        return this.userService.existsByEmail(email)
+                .map(existEmail -> {
+                    if (Boolean.FALSE.equals(existEmail)) {
+                        return null;
+                    } else {
+                        throw new UserUseCaseException(CodeException.INVALID_PARAMETERS, null, "emaill");
+                    }
+                });
     }
 
     private Mono<Void> validateUserFields(final User user) {
         return Mono.when(
                 this.validateName(user),
                 this.validatePhone(user),
-                this.validateEmail(user),
-                this.existEmail(user.email())
-                        .flatMap(existsEmail -> {
-                            if (Boolean.TRUE.equals(existsEmail)) {
-                                log.error(LOGGER_PREFIX + "[validateEmail] email already exists");
-                                return Mono.error(
-                                        new UserUseCaseException(CodeException.INVALID_PARAMETERS, null, "email"));
-                            }
-                            return Mono.empty();
-                        })
+                this.validateEmail(user)
         ).then();
     }
 
