@@ -26,18 +26,17 @@ public class UserUseCase {
     public Mono<User> createUser(final User user) {
         return this.validateUserFields(user)
                 .then(this.validateUniqueEmail(user.email()))
-                .then(Mono.fromCallable(() -> user.toBuilder()
-                        .build()))
+                .then(Mono.fromCallable(() -> user.toBuilder().build()))
                 .flatMap(this.userService::save);
     }
 
     public Mono<Void> validateUniqueEmail(final String email) {
         return this.userService.existsByEmail(email)
-                .map(existEmail -> {
+                .flatMap(existEmail -> {
                     if (Boolean.FALSE.equals(existEmail)) {
-                        return null;
+                        return Mono.empty();
                     } else {
-                        throw new UserUseCaseException(CodeException.INVALID_PARAMETERS, null, "emaill");
+                        return Mono.error(new UserUseCaseException(CodeException.INVALID_PARAMETERS, null, "email"));
                     }
                 });
     }
@@ -86,30 +85,22 @@ public class UserUseCase {
                 .then();
     }
 
-    private Mono<Boolean> existEmail(final String email) {
-        return this.userService.existsByEmail(email);
-    }
-
     public Mono<Void> updateUser(final User user) {
         return this.userService.findByEmail(user.email())
                 .switchIfEmpty(Mono.error(new UserUseCaseException(CodeException.USER_NOT_FOUND, null)))
-                .flatMap(existingUser -> this.withUpdatedFields(existingUser, user.address(), user.phone())
-                        .flatMap(this.userService::save))
+                .flatMap(whitExistingUser -> {
+                    if (!user.isValidPhone()) {
+                        return Mono.error(new UserUseCaseException(CodeException.INVALID_PARAMETERS, null, "phone"));
+                    }
+                    final User updatedUser = whitExistingUser.toBuilder()
+                            .address(user.address())
+                            .phone(user.phone())
+                            .build();
+                    return this.userService.save(updatedUser);
+                })
                 .then();
     }
-
-    private Mono<User> withUpdatedFields(final User existingUser, final String address, final String phone) {
-        if (existingUser.isValidPhone()) {
-            return Mono.error(new UserUseCaseException(CodeException.INVALID_PARAMETERS, null, "phone"));
-        }
-        final User updatedUser = existingUser.toBuilder()
-                .address(address)
-                .phone(phone)
-                .build();
-
-        return Mono.just(updatedUser);
-    }
-
+    
     public Mono<Void> delete(final String userName, final String email) {
         return this.userService.delete(userName, email);
     }
