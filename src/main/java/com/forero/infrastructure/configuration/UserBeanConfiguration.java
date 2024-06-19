@@ -1,10 +1,10 @@
 package com.forero.infrastructure.configuration;
 
-import com.forero.application.command.UserCommand;
-import com.forero.application.command.UserDeleteCommand;
-import com.forero.application.command.UserPartialUpdateCommand;
-import com.forero.application.query.UserQueryByEmail;
-import com.forero.application.query.UsersQuery;
+import com.forero.application.command.CreateUserCommand;
+import com.forero.application.command.DeleteUserCommand;
+import com.forero.application.command.UpdateUserCommand;
+import com.forero.application.query.GetUserQuery;
+import com.forero.application.query.GetUsersQuery;
 import com.forero.application.service.UserService;
 import com.forero.application.usecase.UserUseCase;
 import lombok.RequiredArgsConstructor;
@@ -21,27 +21,27 @@ public class UserBeanConfiguration {
     }
 
     @Bean
-    public UserCommand userCommand(final UserUseCase userUseCase) {
-        return new UserCommand(userUseCase);
+    public CreateUserCommand userCommand(final UserUseCase userUseCase) {
+        return new CreateUserCommand(userUseCase);
     }
 
     @Bean
-    public UserDeleteCommand userDeleteCommand(final UserUseCase userUseCase) {
-        return new UserDeleteCommand(userUseCase);
+    public DeleteUserCommand userDeleteCommand(final UserUseCase userUseCase) {
+        return new DeleteUserCommand(userUseCase);
     }
 
     @Bean
-    public UserPartialUpdateCommand userPartialUpdateCommand(final UserUseCase userUseCase) {
-        return new UserPartialUpdateCommand(userUseCase);
+    public UpdateUserCommand userPartialUpdateCommand(final UserUseCase userUseCase) {
+        return new UpdateUserCommand(userUseCase);
     }
 
     @Bean
-    public UsersQuery usersQuery(final UserUseCase userUseCase) {
-        return new UsersQuery(userUseCase);
+    public GetUsersQuery usersQuery(final UserUseCase userUseCase) {
+        return new GetUsersQuery(userUseCase);
     }
 
     @Bean
-    public UserQueryByEmail userQueryByEmail(final UserUseCase userUseCase) {
-        return new UserQueryByEmail(userUseCase);
+    public GetUserQuery userQueryByEmail(final UserUseCase userUseCase) {
+        return new GetUserQuery(userUseCase);
     }
 }

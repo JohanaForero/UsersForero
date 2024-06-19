@@ -1,10 +1,10 @@
 package com.forero.infrastructure.entrypoint;
 
-import com.forero.application.command.UserCommand;
-import com.forero.application.command.UserDeleteCommand;
-import com.forero.application.command.UserPartialUpdateCommand;
-import com.forero.application.query.UserQueryByEmail;
-import com.forero.application.query.UsersQuery;
+import com.forero.application.command.CreateUserCommand;
+import com.forero.application.command.DeleteUserCommand;
+import com.forero.application.command.UpdateUserCommand;
+import com.forero.application.query.GetUserQuery;
+import com.forero.application.query.GetUsersQuery;
 import com.forero.infrastructure.dto.request.UserPartialUpdateRequestDto;
 import com.forero.infrastructure.dto.request.UserRequestDto;
 import com.forero.infrastructure.dto.response.UserResponseDto;
@@ -30,17 +30,17 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class UserController {
     private static final String LOGGER_PREFIX = String.format("[%s] ", UserController.class.getSimpleName());
-    private final UserCommand userCommand;
+    private final CreateUserCommand createUserCommand;
     private final UserMapper userMapper;
-    private final UsersQuery usersQuery;
-    private final UserQueryByEmail userQueryByEmail;
-    private final UserDeleteCommand userDeleteCommand;
-    private final UserPartialUpdateCommand userPartialUpdateCommand;
+    private final GetUsersQuery getUsersQuery;
+    private final GetUserQuery getUserQuery;
+    private final DeleteUserCommand deleteUserCommand;
+    private final UpdateUserCommand updateUserCommand;
 
     @PostMapping("/register")
     @ResponseStatus(code = HttpStatus.CREATED)
     public Mono<UserResponseDto> createUser(@RequestBody final UserRequestDto userRequestDto) {
-        return this.userCommand.execute(this.userMapper.toModel(userRequestDto))
+        return this.createUserCommand.execute(this.userMapper.toModel(userRequestDto))
                 .doFirst(() -> log.info(LOGGER_PREFIX + "[saveUser] request {}", userRequestDto))
                 .map(this.userMapper::toDto)
                 .doOnSuccess(userCreatedResponseDto ->
@@ -49,7 +49,7 @@ public class UserController {
 
     @GetMapping("/all")
     public Flux<UserResponseDto> getAllUsers() {
-        return this.usersQuery.execute()
+        return this.getUsersQuery.execute()
                 .doFirst(() -> log.info(LOGGER_PREFIX + "[getAllUsers] List {}"))
                 .map(this.userMapper::toDto)
                 .doOnNext(userResponseDto -> log.info(LOGGER_PREFIX + "[all] Response {}", userResponseDto));
@@ -57,7 +57,7 @@ public class UserController {
 
     @GetMapping("/{email}")
     public Mono<UserResponseDto> getUser(@PathVariable final String email) {
-        return this.userQueryByEmail.execute(email)
+        return this.getUserQuery.execute(email)
                 .doFirst(() -> log.info(LOGGER_PREFIX + "[getUser] Request {}", email))
                 .map(this.userMapper::toDto)
                 .doOnSuccess(userResponseDto -> log.info(LOGGER_PREFIX + "[all] Response {}", userResponseDto));
@@ -65,7 +65,7 @@ public class UserController {
 
     @PostMapping("/userNew")
     public Mono<Void> updateUser(@RequestBody final UserPartialUpdateRequestDto userPartialUpdateDto) {
-        return this.userPartialUpdateCommand.execute(this.userMapper.toModel(userPartialUpdateDto))
+        return this.updateUserCommand.execute(this.userMapper.toModel(userPartialUpdateDto))
                 .doFirst(() -> log.info(LOGGER_PREFIX + "[updateUser] request {}", userPartialUpdateDto))
                 .doOnSuccess(voidFlow ->
                         log.info(LOGGER_PREFIX + "[updateUser] response void"));
@@ -74,7 +74,7 @@ public class UserController {
     @DeleteMapping("/userDelete")
     public Mono<Void> deleteUser(@RequestParam(value = "name") final String userName,
                                  @RequestParam(value = "email") final String email) {
-        return this.userDeleteCommand.execute(userName, email)
+        return this.deleteUserCommand.execute(userName, email)
                 .doFirst(() -> log.info(LOGGER_PREFIX + "[deleteUser] request {}, {}", userName, email))
                 .doOnSuccess(voidFlow ->
                         log.info(LOGGER_PREFIX + "[deleteUser] response void"));

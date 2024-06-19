@@ -23,8 +23,8 @@ public class MongoDBServiceImpl implements UserService {
     @Override
     public Mono<User> save(final User user) {
         return Mono.just(user)
-                .map(this.userMapper::toEntity)
                 .doFirst(() -> log.info(LOGGER_PREFIX + "[createUser] Request {}", user))
+                .map(this.userMapper::toEntity)
                 .flatMap(this.userDao::save)
                 .doOnSuccess(userEntityResult -> log.info(LOGGER_PREFIX + "[createUser] Response {}", userEntityResult))
                 .map(this.userMapper::toModel)

@@ -2,6 +2,7 @@ package com.forero.infrastructure.exception;
 
 import com.forero.application.exception.CoreException;
 import com.forero.domain.exception.CodeException;
+import com.forero.domain.exception.UserDomainException;
 import com.forero.domain.model.ErrorObjectDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.UncategorizedMongoDbException;
@@ -32,6 +33,21 @@ public class UserControllerAdvice {
                     final ErrorObjectDto errorResponseDto = ErrorObjectDto.builder()
                             .code(codeException.name())
                             .message(coreExceptionS.getMessage())
+                            .build();
+                    final HttpStatus status = HTTP_STATUS_BY_CODE_EXCEPTION
+                            .getOrDefault(codeException, HttpStatus.NOT_EXTENDED);
+                    return Mono.just(new ResponseEntity<>(errorResponseDto, status));
+                });
+    }
+
+    @ExceptionHandler(UserDomainException.class)
+    public Mono<ResponseEntity<ErrorObjectDto>> handlerUserDomainException(final UserDomainException userDomainException) {
+        return Mono.just(userDomainException)
+                .flatMap(userDomainException1 -> {
+                    final CodeException codeException = userDomainException.getCodeException();
+                    final ErrorObjectDto errorResponseDto = ErrorObjectDto.builder()
+                            .code(codeException.name())
+                            .message(userDomainException1.getMessage())
                             .build();
                     final HttpStatus status = HTTP_STATUS_BY_CODE_EXCEPTION
                             .getOrDefault(codeException, HttpStatus.NOT_EXTENDED);

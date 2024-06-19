@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
-public class UserCommand {
+public class CreateUserCommand {
     private final UserUseCase userUseCase;
 
     public Mono<User> execute(final User user) {

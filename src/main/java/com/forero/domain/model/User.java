@@ -1,5 +1,7 @@
 package com.forero.domain.model;
 
+import com.forero.domain.exception.CodeException;
+import com.forero.domain.exception.UserDomainException;
 import lombok.Builder;
 
 @Builder(toBuilder = true)
@@ -8,15 +10,21 @@ public record User(String id, String name, String email, String phone, String ad
     private static final String GMAIL_DOMAIN = "@gmail.com";
     private static final int PHONE_LENGTH = 10;
 
-    public boolean validateUserName() {
-        return this.name != null && !this.name.matches(REGEX_CONTAINS_NUMBERS);
+    public void validateUserName() {
+        if (this.name != null && this.name.matches(REGEX_CONTAINS_NUMBERS)) {
+            throw new UserDomainException(CodeException.INVALID_PARAMETERS, null, "name");
+        }
     }
 
-    public boolean isValidEmail() {
-        return this.email != null && this.email.endsWith(GMAIL_DOMAIN);
+    public void validEmail() {
+        if (this.email != null && !this.email.endsWith(GMAIL_DOMAIN)) {
+            throw new UserDomainException(CodeException.INVALID_PARAMETERS, null, "email");
+        }
     }
 
-    public boolean isValidPhone() {
-        return this.phone != null && this.phone.length() == PHONE_LENGTH;
+    public void validPhone() {
+        if (this.phone != null && this.phone.length() != PHONE_LENGTH) {
+            throw new UserDomainException(CodeException.INVALID_PARAMETERS, null, "phone");
+        }
     }
 }
