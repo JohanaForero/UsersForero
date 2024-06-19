@@ -36,11 +36,12 @@ public class MongoDBServiceImpl implements UserService {
 
     @Override
     public Mono<Boolean> existsByEmail(final String email) {
-        log.info(LOGGER_PREFIX, "[existsByEmail] Request {}", email);
-        return this.userDao.existsByEmail(email)
-                .doOnSuccess(isEmail -> log.info(LOGGER_PREFIX, "[existsByEmail] Response {}", isEmail))
+        return Mono.just(email)
+                .doFirst(() -> log.info(LOGGER_PREFIX + "[existsByEmail] Request {}"))
+                .flatMap(this.userDao::existsByEmail)
+                .doOnNext(isEmail -> log.info(LOGGER_PREFIX + "[existsByEmail] {}", isEmail))
                 .onErrorResume(error -> {
-                    log.error(LOGGER_PREFIX, "[existsByEmail] Error occurred: {}", error.getMessage());
+                    log.error(LOGGER_PREFIX + "[existsByEmail Error occurred: {}", error.getMessage());
                     return Mono.error(new RepositoryException(CodeException.INTERNAL_SERVER_ERROR, null));
                 });
     }
@@ -48,7 +49,6 @@ public class MongoDBServiceImpl implements UserService {
     @Override
     public Flux<User> getAllUsers() {
         return this.userDao.findAll()
-                .doFirst(() -> log.info(LOGGER_PREFIX + "[getAllUsers] List {}"))
                 .map(this.userMapper::toModel)
                 .doOnSubscribe(subscription -> log.info(LOGGER_PREFIX + "[getAllUsers] Subscription started"))
                 .doOnNext(user -> log.info(LOGGER_PREFIX + "[getAllUsers] Retrieved user: {}", user))

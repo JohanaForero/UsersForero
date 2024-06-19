@@ -52,7 +52,7 @@ public class UserController {
         return this.getUsersQuery.execute()
                 .doFirst(() -> log.info(LOGGER_PREFIX + "[getAllUsers] List {}"))
                 .map(this.userMapper::toDto)
-                .doOnNext(userResponseDto -> log.info(LOGGER_PREFIX + "[all] Response {}", userResponseDto));
+                .doOnComplete(() -> log.info(LOGGER_PREFIX + "[getAllUsers] Completed"));
     }
 
     @GetMapping("/{email}")

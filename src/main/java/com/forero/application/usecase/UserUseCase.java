@@ -12,7 +12,6 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @RequiredArgsConstructor
 public class UserUseCase {
-    private static final String LOGGER_PREFIX = String.format("[%s] ", UserUseCase.class.getSimpleName());
     private final UserService userService;
 
     public Flux<User> getUsers() {
