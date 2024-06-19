@@ -1,5 +1,7 @@
 spring:
+  application:
+    name: user
   data:
     mongodb:
-      uri: mongodb://localhost:27017/test-database
-      database: test-database
+      database: "test-db"
+      uri: "mongodb://localhost:27017/test-db"

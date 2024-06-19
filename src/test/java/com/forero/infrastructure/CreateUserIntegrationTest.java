@@ -1,44 +1,48 @@
 package com.forero.infrastructure;
 
 import com.forero.BaseIT;
+import com.forero.infrastructure.adapter.entity.UserEntity;
 import com.forero.infrastructure.dto.request.UserRequestDto;
 import com.forero.infrastructure.dto.response.UserResponseDto;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
 
 class CreateUserIntegrationTest extends BaseIT {
-    private static final String BASE_PATH = "/users";
+    private static final String BASE_PATH = "/users/register";
 
-    @Autowired
-    private WebTestClient webTestClient;
+    public String findUserByEmail(final String email) {
+        final Query query = new Query();
+        query.addCriteria(Criteria.where("email").is(email));
+        return this.reactiveMongoTemplate.findOne(query, UserEntity.class).block().getId();
+    }
 
     @Test
-    void testCreateUser_withRequestValid_shouldReturnUserResponseDtoAndStatusCreated() {
-        //Given
+    void testSaveUser_withRequestValid_shouldReturnUserResponseDtoAndStatusCreated() {
         final UserRequestDto userRequestDto = UserRequestDto.builder()
-                .name("name")
-                .email("test@gmail.com")
-                .phone("1234567892")
-                .address("Bella vista")
-                .build();
-        final UserResponseDto userResponseDto = UserResponseDto.builder()
-                .id("")
-                .name("name")
-                .email("test@gmail.com")
-                .phone("1234567892")
-                .address("Bella vista")
+                .email("john.doe@gmail.com")
+                .name("John Doe")
+                .phone("0123456789")
+                .address("Cra 12#")
                 .build();
 
-        //When
-        this.webTestClient.post().uri(BASE_PATH)
-                .body(userRequestDto, UserRequestDto.class)
-                .exchange()
-                .expectStatus().isCreated()
+        // When
+        final WebTestClient.ResponseSpec response = this.webTestClient.post().uri(BASE_PATH)
+                .body(BodyInserters.fromValue(userRequestDto))
+                .exchange();
+
+        final UserResponseDto userResponseDto = UserResponseDto.builder()
+                .id(this.findUserByEmail("john.doe@gmail.com"))
+                .name("John Doe")
+                .email("john.doe@gmail.com")
+                .phone("0123456789")
+                .address("Cra 12#")
+                .build();
+
+        response.expectStatus().isCreated()
                 .expectBody(UserResponseDto.class)
                 .isEqualTo(userResponseDto);
-
-        //Then
-
     }
 }

@@ -1,24 +1,25 @@
 package com.forero;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.testcontainers.containers.MongoDBContainer;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class BaseIT {
+    @Autowired
+    protected WebTestClient webTestClient;
 
-    static final MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:4.0.10");
+    @Autowired
+    protected ReactiveMongoTemplate reactiveMongoTemplate;
 
-    @BeforeAll
-    public static void startMongoDBContainer() {
-        mongoDBContainer.start();
-    }
-
-    @AfterAll
-    public static void stopMongoDBContainer() {
-        if (mongoDBContainer.isRunning()) {
-            mongoDBContainer.close();
-        }
+    @BeforeEach
+    void setup() {
+        this.reactiveMongoTemplate.dropCollection("users").block();
     }
 }
