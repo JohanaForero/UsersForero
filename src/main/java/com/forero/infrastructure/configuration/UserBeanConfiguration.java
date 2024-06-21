@@ -1,21 +1,19 @@
 package com.forero.infrastructure.configuration;
 
-import com.forero.application.command.UserCommand;
-import com.forero.application.query.UserQuery;
+import com.forero.application.command.CreateUserCommand;
+import com.forero.application.command.DeleteUserCommand;
+import com.forero.application.command.UpdateUserCommand;
+import com.forero.application.query.GetUserQuery;
+import com.forero.application.query.GetUsersQuery;
 import com.forero.application.service.UserService;
 import com.forero.application.usecase.UserUseCase;
-import com.mongodb.reactivestreams.client.MongoClients;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.ReactiveMongoDatabaseFactory;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.mongodb.core.SimpleReactiveMongoDatabaseFactory;
 
 @Configuration
 @RequiredArgsConstructor
 public class UserBeanConfiguration {
-    private final MongoDBProperties mongoDBProperties;
 
     @Bean
     public UserUseCase userUseCase(final UserService userService) {
@@ -23,23 +21,27 @@ public class UserBeanConfiguration {
     }
 
     @Bean
-    public UserCommand userCommand(final UserUseCase userUseCase) {
-        return new UserCommand(userUseCase);
+    public CreateUserCommand userCommand(final UserUseCase userUseCase) {
+        return new CreateUserCommand(userUseCase);
     }
 
     @Bean
-    public UserQuery userQuery(final UserUseCase userUseCase) {
-        return new UserQuery(userUseCase);
+    public DeleteUserCommand userDeleteCommand(final UserUseCase userUseCase) {
+        return new DeleteUserCommand(userUseCase);
     }
 
     @Bean
-    public ReactiveMongoDatabaseFactory reactiveMongoDatabaseFactory() {
-        return new SimpleReactiveMongoDatabaseFactory(MongoClients.create(this.mongoDBProperties.getUri()),
-                this.mongoDBProperties.getDatabase());
+    public UpdateUserCommand userPartialUpdateCommand(final UserUseCase userUseCase) {
+        return new UpdateUserCommand(userUseCase);
     }
 
     @Bean
-    public ReactiveMongoTemplate reactiveMongoTemplate() {
-        return new ReactiveMongoTemplate(this.reactiveMongoDatabaseFactory());
+    public GetUsersQuery usersQuery(final UserUseCase userUseCase) {
+        return new GetUsersQuery(userUseCase);
+    }
+
+    @Bean
+    public GetUserQuery userQueryByEmail(final UserUseCase userUseCase) {
+        return new GetUserQuery(userUseCase);
     }
 }

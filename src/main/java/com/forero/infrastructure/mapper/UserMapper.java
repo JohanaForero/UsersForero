@@ -2,6 +2,7 @@ package com.forero.infrastructure.mapper;
 
 import com.forero.domain.model.User;
 import com.forero.infrastructure.adapter.entity.UserEntity;
+import com.forero.infrastructure.dto.request.UserPartialUpdateRequestDto;
 import com.forero.infrastructure.dto.request.UserRequestDto;
 import com.forero.infrastructure.dto.response.UserResponseDto;
 import org.mapstruct.Mapper;
@@ -26,6 +27,8 @@ public interface UserMapper {
                 .address(userEntity.getAddress())
                 .build();
     }
+
+    User toModel(final UserPartialUpdateRequestDto userPartialUpdateRequestDto);
 
     UserEntity toEntity(User user);
 }
