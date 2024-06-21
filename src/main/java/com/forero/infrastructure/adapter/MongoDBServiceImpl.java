@@ -23,7 +23,6 @@ public class MongoDBServiceImpl implements UserService {
     @Override
     public Mono<User> save(final User user) {
         return Mono.just(user)
-                .doFirst(() -> log.info(LOGGER_PREFIX + "[createUser] Request {}", user))
                 .map(this.userMapper::toEntity)
                 .flatMap(this.userDao::save)
                 .doOnSuccess(userEntityResult -> log.info(LOGGER_PREFIX + "[createUser] Response {}", userEntityResult))
@@ -49,29 +48,27 @@ public class MongoDBServiceImpl implements UserService {
     @Override
     public Flux<User> getAllUsers() {
         return this.userDao.findAll()
-                .map(this.userMapper::toModel)
-                .doOnSubscribe(subscription -> log.info(LOGGER_PREFIX + "[getAllUsers] Subscription started"))
-                .doOnNext(user -> log.info(LOGGER_PREFIX + "[getAllUsers] Retrieved user: {}", user))
-                .doOnError(error -> log.error(LOGGER_PREFIX + "[getAllUsers] Error retrieving users: {}",
-                        error.getMessage()))
-                .doOnComplete(() -> log.info(LOGGER_PREFIX + "[getAllUsers] Completed listing users"));
-
+                .doFirst(() -> log.info(LOGGER_PREFIX + "[getAllUsers] request"))
+                .doOnNext(userEntityResponse -> log.info(LOGGER_PREFIX + "[getAllUsers] response {}",
+                        userEntityResponse))
+                .map(this.userMapper::toModel);
     }
 
     @Override
     public Mono<Void> delete(final String nameUser, final String email) {
         return this.userDao.deleteByNameAndEmail(nameUser, email)
                 .doFirst(() -> log.info(LOGGER_PREFIX + "[deleteUser] request {}, {}", nameUser, email))
-                .doOnSuccess(voidFlow -> log.info(LOGGER_PREFIX + "[deleteUser] response void"));
+                .doOnNext(voidFlow -> log.info(LOGGER_PREFIX + "[deleteUser] response void"));
     }
 
     @Override
     public Mono<User> findByEmail(final String email) {
         return this.userDao.findByEmail(email)
                 .doFirst(() -> log.info(LOGGER_PREFIX, "[findByEmail] Request {}", email))
-                .doOnSuccess(voidFlow -> log.info(LOGGER_PREFIX + "[deleteUser] response void"))
+                .switchIfEmpty(Mono.error(new RepositoryException(CodeException.USER_NOT_FOUND, null, email)))
+                .doOnNext(userEntityResponse -> log.info(LOGGER_PREFIX + "[findByEmail] response {}",
+                        userEntityResponse))
                 .map(this.userMapper::toModel)
-                .doOnError(error -> log.error("[findUserByEmail] Error finding user by email: {}", email, error))
-                .switchIfEmpty(Mono.error(new RepositoryException(CodeException.USER_NOT_FOUND, null, email)));
+                .doOnError(error -> log.error("[findUserByEmail] Error finding user by email: {}", email, error));
     }
 }
