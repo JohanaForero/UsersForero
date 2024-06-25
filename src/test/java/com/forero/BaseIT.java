@@ -1,10 +1,13 @@
 package com.forero;
 
+import com.forero.infrastructure.adapter.entity.UserEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -17,6 +20,13 @@ public abstract class BaseIT {
 
     @Autowired
     protected ReactiveMongoTemplate reactiveMongoTemplate;
+
+    protected String findUserByEmail(final String email) {
+        final Query query = new Query();
+        query.addCriteria(Criteria.where("email").is(email));
+        return this.reactiveMongoTemplate.findOne(query, UserEntity.class)
+                .block().getId();
+    }
 
     @BeforeEach
     void setup() {

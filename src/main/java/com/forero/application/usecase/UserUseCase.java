@@ -48,17 +48,10 @@ public class UserUseCase {
                 });
     }
 
-    public Mono<Void> updateUser(final User user) {
-        return this.userService.findByEmail(user.email())
-                .switchIfEmpty(Mono.error(new UserUseCaseException(CodeException.USER_NOT_FOUND, null)))
-                .flatMap(whitExistingUser -> {
-                    final User updatedUser = whitExistingUser.toBuilder()
-                            .address(user.address())
-                            .phone(user.phone())
-                            .build();
-                    return this.userService.save(updatedUser);
-                })
-                .then();
+    public Mono<Void> updateUser(final User userWithValueNews) {
+        return this.userService.findByEmail(userWithValueNews.email())
+                .map(userToUpdate -> userToUpdate.withUpdatedFields(userWithValueNews))
+                .flatMap(userNew -> this.userService.save(userNew).then());
     }
 
     public Mono<Void> delete(final String userName, final String email) {

@@ -15,18 +15,7 @@ public interface UserMapper {
 
     UserResponseDto toDto(User user);
 
-    default User toModel(final UserEntity userEntity) {
-        if (userEntity == null) {
-            return null;
-        }
-        return User.builder()
-                .id(userEntity.getId())
-                .name(userEntity.getName())
-                .email(userEntity.getEmail())
-                .phone(userEntity.getPhone())
-                .address(userEntity.getAddress())
-                .build();
-    }
+    User toModel(UserEntity userEntity);
 
     User toModel(final UserPartialUpdateRequestDto userPartialUpdateRequestDto);
 

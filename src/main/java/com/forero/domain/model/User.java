@@ -27,4 +27,12 @@ public record User(String id, String name, String email, String phone, String ad
             throw new UserDomainException(CodeException.INVALID_PARAMETERS, null, "phone");
         }
     }
+
+    public User withUpdatedFields(final User userWithValueNews) {
+        return this.toBuilder()
+                .name(userWithValueNews.name())
+                .phone(userWithValueNews.phone())
+                .address(userWithValueNews.address())
+                .build();
+    }
 }

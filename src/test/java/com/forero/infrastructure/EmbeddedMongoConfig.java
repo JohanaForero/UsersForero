@@ -17,10 +17,8 @@ public class EmbeddedMongoConfig {
                 .net(Start.to(Net.class).initializedWith(Net.defaults()
                         .withPort(27017)))
                 .build();
-        System.out.println("MongoDB instance...");
         running = serverMongoDB.start(Version.Main.V8_0_RC);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("Shutting down MongoDB instance...");
             running.current().stop();
         }));
     }
