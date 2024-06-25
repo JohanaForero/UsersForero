@@ -25,8 +25,13 @@ class CreateUserIntegrationTest extends BaseIT {
                 .body(BodyInserters.fromValue(userRequestDto))
                 .exchange();
 
-        UserResponseDto userResponseDto =
-                userRequestDto.toBuilder().id(this.findUserByEmail("john.doe@gmail.com")).build();
+        final UserResponseDto userResponseDto = UserResponseDto.builder()
+                .id(this.findUserByEmail("john.doe@gmail.com"))
+                .name("John Doe")
+                .email("john.doe@gmail.com")
+                .phone("0123456789")
+                .address("Cra 12#")
+                .build();
         //Then
         response.expectStatus().isCreated()
                 .expectBody(UserResponseDto.class)

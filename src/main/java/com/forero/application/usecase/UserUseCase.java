@@ -24,16 +24,16 @@ public class UserUseCase {
 
     public Mono<User> createUser(final User user) {
         return this.validateUser(user)
-                .then(this.validateUniqueEmail(user.email()))
-                .then(this.userService.save(user));
+                .flatMap(userValid -> this.validateUniqueEmail(user.email())
+                        .then(this.userService.save(userValid)));
     }
 
-    private Mono<Void> validateUser(final User user) {
+    private Mono<User> validateUser(final User user) {
         return Mono.fromCallable(() -> {
             user.validateUserName();
             user.validEmail();
             user.validPhone();
-            return null;
+            return user;
         });
     }
 
