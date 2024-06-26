@@ -24,8 +24,12 @@ public class MongoDBServiceImpl implements UserService {
     public Mono<User> save(final User user) {
         return Mono.just(user)
                 .map(this.userMapper::toEntity)
-                .flatMap(this.userDao::save)
-                .doOnSuccess(userEntityResult -> log.info(LOGGER_PREFIX + "[createUser] Response {}", userEntityResult))
+                .flatMap(entity -> {
+                    log.info(LOGGER_PREFIX + "[save] Saving entity to database: {}", entity);
+                    return this.userDao.save(entity)
+                            .doOnSuccess(savedEntity -> log.info(LOGGER_PREFIX + "[save] Entity saved to database: {}",
+                                    savedEntity));
+                })
                 .map(this.userMapper::toModel)
                 .onErrorResume(error -> {
                     log.error(LOGGER_PREFIX + "[createUser] Error occurred: {}", error.getMessage());
@@ -36,11 +40,14 @@ public class MongoDBServiceImpl implements UserService {
     @Override
     public Mono<Boolean> existsByEmail(final String email) {
         return Mono.just(email)
-                .doFirst(() -> log.info(LOGGER_PREFIX + "[existsByEmail] Request {}"))
-                .flatMap(this.userDao::existsByEmail)
-                .doOnNext(isEmail -> log.info(LOGGER_PREFIX + "[existsByEmail] {}", isEmail))
+                .flatMap(e -> {
+                    log.info(LOGGER_PREFIX + "[existsByEmail] Request: {}", e);
+                    return this.userDao.existsByEmail(e)
+                            .doOnNext(result ->
+                                    log.info(LOGGER_PREFIX + "[existsByEmail] Response: {}", result));
+                })
                 .onErrorResume(error -> {
-                    log.error(LOGGER_PREFIX + "[existsByEmail Error occurred: {}", error.getMessage());
+                    log.error(LOGGER_PREFIX + "[existsByEmail] Error occurred: {}", error.getMessage());
                     return Mono.error(new RepositoryException(CodeException.INTERNAL_SERVER_ERROR, null));
                 });
     }
@@ -48,27 +55,33 @@ public class MongoDBServiceImpl implements UserService {
     @Override
     public Flux<User> getAllUsers() {
         return this.userDao.findAll()
-                .doFirst(() -> log.info(LOGGER_PREFIX + "[getAllUsers] request"))
-                .doOnNext(userEntityResponse -> log.info(LOGGER_PREFIX + "[getAllUsers] response {}",
+                .doFirst(() -> log.info(LOGGER_PREFIX + "[getAllUsers] Request"))
+                .doOnNext(userEntityResponse -> log.info(LOGGER_PREFIX + "[getAllUsers] Response {}",
                         userEntityResponse))
                 .map(this.userMapper::toModel);
     }
 
     @Override
     public Mono<Void> delete(final String nameUser, final String email) {
-        return this.userDao.deleteByNameAndEmail(nameUser, email)
-                .doFirst(() -> log.info(LOGGER_PREFIX + "[deleteUser] request {}, {}", nameUser, email))
-                .doOnNext(voidFlow -> log.info(LOGGER_PREFIX + "[deleteUser] response void"));
+        return Mono.defer(() -> {
+            log.info(LOGGER_PREFIX + "[delete] Request {}", nameUser, email);
+            return this.userDao.deleteByNameAndEmail(nameUser, email)
+                    .doOnSuccess(voidResult -> log.info(LOGGER_PREFIX + "[delete] Response {}", nameUser, email))
+                    .doOnError(error -> log.error(LOGGER_PREFIX + "[delete] Error occurred {}", nameUser, email,
+                            error.getMessage()));
+        });
     }
 
     @Override
     public Mono<User> findByEmail(final String email) {
-        return this.userDao.findByEmail(email)
-                .doFirst(() -> log.info(LOGGER_PREFIX, "[findByEmail] Request {}", email))
-                .switchIfEmpty(Mono.error(new RepositoryException(CodeException.USER_NOT_FOUND, null, email)))
-                .doOnNext(userEntityResponse -> log.info(LOGGER_PREFIX + "[findByEmail] response {}",
-                        userEntityResponse))
-                .map(this.userMapper::toModel)
-                .doOnError(error -> log.error("[findUserByEmail] Error finding user by email: {}", email, error));
+        return Mono.defer(() -> {
+            log.info(LOGGER_PREFIX + "[findByEmail] Request {}", email);
+            return this.userDao.findByEmail(email)
+                    .doOnSubscribe(subscription -> log.info(LOGGER_PREFIX + "[findByEmail] Request {}", email))
+                    .doOnNext(userEntityResponse -> log.info(LOGGER_PREFIX + "[findByEmail] Response {}",
+                            userEntityResponse))
+                    .doOnError(error -> log.error(LOGGER_PREFIX + "[findByEmail] Error {}", email, error))
+                    .map(this.userMapper::toModel);
+        });
     }
 }

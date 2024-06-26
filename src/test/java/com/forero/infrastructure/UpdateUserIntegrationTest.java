@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
-public class UpdateUserIntegrationTest extends BaseIT {
+class UpdateUserIntegrationTest extends BaseIT {
     private static final String BASE_PATH = "/users/userNew";
 
     @Test

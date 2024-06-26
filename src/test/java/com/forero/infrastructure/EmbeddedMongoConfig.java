@@ -9,7 +9,7 @@ import de.flapdoodle.reverse.transitions.Start;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class EmbeddedMongoConfig {
+class EmbeddedMongoConfig {
     private static final TransitionWalker.ReachedState<RunningMongodProcess> running;
 
     static {
