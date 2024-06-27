@@ -48,6 +48,7 @@ public class UserController {
     }
 
     @GetMapping("/all")
+    @ResponseStatus(code = HttpStatus.OK)
     public Flux<UserResponseDto> getAllUsers() {
         return this.getUsersQuery.execute()
                 .doFirst(() -> log.info(LOGGER_PREFIX + "[getAllUsers] List {}"))
@@ -56,6 +57,7 @@ public class UserController {
     }
 
     @GetMapping("/{email}")
+    @ResponseStatus(code = HttpStatus.OK)
     public Mono<UserResponseDto> getUser(@PathVariable final String email) {
         return this.getUserQuery.execute(email)
                 .doFirst(() -> log.info(LOGGER_PREFIX + "[getUser] Request {}", email))
@@ -64,6 +66,7 @@ public class UserController {
     }
 
     @PostMapping("/userNew")
+    @ResponseStatus(code = HttpStatus.OK)
     public Mono<Void> updateUser(@RequestBody final UserPartialUpdateRequestDto userPartialUpdateDto) {
         return this.updateUserCommand.execute(this.userMapper.toModel(userPartialUpdateDto))
                 .doFirst(() -> log.info(LOGGER_PREFIX + "[updateUser] request {}", userPartialUpdateDto))
@@ -72,6 +75,7 @@ public class UserController {
     }
 
     @DeleteMapping("/userDelete")
+    @ResponseStatus(code = HttpStatus.OK)
     public Mono<Void> deleteUser(@RequestParam(value = "name") final String userName,
                                  @RequestParam(value = "email") final String email) {
         return this.deleteUserCommand.execute(userName, email)

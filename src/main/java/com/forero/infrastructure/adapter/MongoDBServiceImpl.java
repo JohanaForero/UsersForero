@@ -28,13 +28,13 @@ public class MongoDBServiceImpl implements UserService {
                     log.info(LOGGER_PREFIX + "[save] Saving entity to database: {}", entity);
                     return this.userDao.save(entity)
                             .doOnSuccess(savedEntity -> log.info(LOGGER_PREFIX + "[save] Entity saved to database: {}",
-                                    savedEntity));
+                                    savedEntity))
+                            .onErrorResume(error -> {
+                                log.error(LOGGER_PREFIX + "[createUser] Error occurred: {}", error.getMessage());
+                                return Mono.error(new RepositoryException(CodeException.INTERNAL_SERVER_ERROR, null));
+                            });
                 })
-                .map(this.userMapper::toModel)
-                .onErrorResume(error -> {
-                    log.error(LOGGER_PREFIX + "[createUser] Error occurred: {}", error.getMessage());
-                    return Mono.error(new RepositoryException(CodeException.INTERNAL_SERVER_ERROR, null));
-                });
+                .map(this.userMapper::toModel);
     }
 
     @Override
