@@ -19,8 +19,8 @@ class GetAllUsersIntegrationTest extends BaseIT {
         //Given
         final UserEntity user1 = new UserEntity(null, "andres", "andres@gmail.com", "3147822930", "Cra 12#");
         final UserEntity user2 = new UserEntity(null, "genesis", "genesis@gmail.com", "3147822940", "Cra 14#");
-        this.reactiveMongoTemplate.save(user1).block();
-        this.reactiveMongoTemplate.save(user2).block();
+        this.reactiveMongoTemplate.insert(user1).block();
+        this.reactiveMongoTemplate.insert(user2).block();
 
         // When
         final WebTestClient.ResponseSpec response = this.webTestClient.post().uri(BASE_PATH)

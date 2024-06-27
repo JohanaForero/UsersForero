@@ -17,7 +17,7 @@ class DeleteUserIntegrationTest extends BaseIT {
         final String email = "johndoe@gmail.com";
         final UserEntity userToDelete = new UserEntity(null, "john.doe@gmail.com",
                 "John", "1000500009", "Cra 22L");
-        this.reactiveMongoTemplate.save(userToDelete).block();
+        this.reactiveMongoTemplate.insert(userToDelete).block();
 
         final WebTestClient.ResponseSpec response = this.webTestClient.delete()
                 .uri(uriBuilder -> uriBuilder

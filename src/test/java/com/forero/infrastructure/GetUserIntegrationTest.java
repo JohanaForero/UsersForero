@@ -16,7 +16,7 @@ class GetUserIntegrationTest extends BaseIT {
         //Given
         final String email = "andres@gmail.com";
         final UserEntity user1 = new UserEntity(null, "andres", "andres@gmail.com", "3147822930", "Cra 12#");
-        this.reactiveMongoTemplate.save(user1).block();
+        this.reactiveMongoTemplate.insert(user1).block();
 
         final UserResponseDto userResponseDto = UserResponseDto.builder()
                 .id(this.findUserByEmail("andres@gmail.com"))

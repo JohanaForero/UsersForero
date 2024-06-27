@@ -15,7 +15,7 @@ class UpdateUserIntegrationTest extends BaseIT {
         //Given
         final UserEntity userEntity = new UserEntity(null, "john.doe@gmail.com",
                 "John", "1000500009", "Cra 22L");
-        this.reactiveMongoTemplate.save(userEntity).block();
+        this.reactiveMongoTemplate.insert(userEntity).block();
         final UserPartialUpdateRequestDto userPartialUpdateRequestDto = UserPartialUpdateRequestDto.builder()
                 .email("john.doe@gmail.com")
                 .phone("0123456789")
