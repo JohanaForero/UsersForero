@@ -70,7 +70,7 @@ public class UserController {
     public Mono<Void> updateUser(@RequestBody final UserPartialUpdateRequestDto userPartialUpdateDto) {
         return this.updateUserCommand.execute(this.userMapper.toModel(userPartialUpdateDto))
                 .doFirst(() -> log.info(LOGGER_PREFIX + "[updateUser] request {}", userPartialUpdateDto))
-                .doOnSuccess(voidFlow ->
+                .doOnSuccess(ignored ->
                         log.info(LOGGER_PREFIX + "[updateUser] response void"));
     }
 
@@ -80,7 +80,7 @@ public class UserController {
                                  @RequestParam(value = "email") final String email) {
         return this.deleteUserCommand.execute(userName, email)
                 .doFirst(() -> log.info(LOGGER_PREFIX + "[deleteUser] request {}, {}", userName, email))
-                .doOnSuccess(voidFlow ->
+                .doOnSuccess(ignored ->
                         log.info(LOGGER_PREFIX + "[deleteUser] response void"));
     }
 }

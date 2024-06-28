@@ -24,7 +24,7 @@ public class UserUseCase {
 
     public Mono<User> createUser(final User user) {
         return this.validateUser(user)
-                .flatMap(userValid -> this.validateUniqueEmail(user.email())
+                .flatMap(userValid -> this.validateUniqueEmail(userValid.email())
                         .then(this.userService.save(userValid)));
     }
 

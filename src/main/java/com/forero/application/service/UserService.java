@@ -11,7 +11,7 @@ public interface UserService {
 
     Flux<User> getAllUsers();
 
-    Mono<Void> delete(final String userName, final String email);
+    Mono<Void> delete(String userName, String email);
 
     Mono<User> findByEmail(String email);
 }
